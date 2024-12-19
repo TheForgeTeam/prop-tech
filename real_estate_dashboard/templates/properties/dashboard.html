@@ -1,8 +1,212 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block extra_head %}
+<style>
+  .chart-container {
+    position: relative;
+    height: 300px;
+    width: 100%;
+  }
+</style>
+{% endblock %} {% block content %}
+<div class="container mx-auto px-4">
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-gray-500 text-sm font-medium">Total Properties</h3>
+      <p class="text-3xl font-bold text-gray-900">{{ total_properties }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-gray-500 text-sm font-medium">Active Rentals</h3>
+      <p class="text-3xl font-bold text-blue-600">{{ total_rentals }}</p>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-gray-500 text-sm font-medium">Completed Sales</h3>
+      <p class="text-3xl font-bold text-green-600">{{ total_sales }}</p>
+    </div>
+  </div>
 
-{% block content %}
-<div class="container mx-auto">
-    <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
-    <!-- Content will go here -->
+  <!-- Charts Section -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-lg font-semibold mb-4">Deals Distribution</h3>
+      <div class="chart-container">
+        <canvas id="dealsChart"></canvas>
+      </div>
+    </div>
+    <div class="bg-white rounded-lg shadow p-6">
+      <h3 class="text-lg font-semibold mb-4">Property Types</h3>
+      <div class="chart-container flex justify-center">
+        <canvas id="propertyTypesChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- Recent Deals Tables -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Recent Rentals -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="border-b px-6 py-4">
+        <h3 class="text-lg font-semibold">Recent Rentals</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Property
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Price
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for rental in recent_rentals %}
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                {{ rental.property.title }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                ${{ rental.price }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if rental.status == 'active' %}bg-green-100 text-green-800 {% elif rental.status == 'pending' %}bg-yellow-100 text-yellow-800 {% else %}bg-gray-100 text-gray-800{% endif %}"
+                >
+                  {{ rental.status }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Recent Sales -->
+    <div class="bg-white rounded-lg shadow">
+      <div class="border-b px-6 py-4">
+        <h3 class="text-lg font-semibold">Recent Sales</h3>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Property
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Price
+              </th>
+              <th
+                class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase"
+              >
+                Status
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            {% for sale in recent_sales %}
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                {{ sale.property.title }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm">
+                ${{ sale.price }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span
+                  class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full {% if sale.status == 'completed' %}bg-green-100 text-green-800 {% elif sale.status == 'pending' %}bg-yellow-100 text-yellow-800 {% else %}bg-gray-100 text-gray-800{% endif %}"
+                >
+                  {{ sale.status }}
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
 </div>
+
+<!-- Chart.js Script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+  // Deals Distribution Chart
+  const dealsData = JSON.parse('{{ deals_by_type_json|safe }}');
+  const dealsCtx = document.getElementById('dealsChart').getContext('2d');
+  new Chart(dealsCtx, {
+    type: 'bar',
+    data: {
+      labels: dealsData.map((item) =>
+        item.deal_type === 'rent' ? 'Rentals' : 'Sales'
+      ),
+      datasets: [
+        {
+          label: 'Number of Deals',
+          data: dealsData.map((item) => item.count),
+          backgroundColor: ['#3B82F6', '#10B981'],
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true, // Change this to true
+      scales: {
+        y: {
+          beginAtZero: true,
+          ticks: {
+            stepSize: 1,
+          },
+        },
+      },
+    },
+  });
+
+  // Property Types Chart
+  const propertyData = JSON.parse('{{ property_by_type_json|safe }}');
+  const propertyCtx = document
+    .getElementById('propertyTypesChart')
+    .getContext('2d');
+  new Chart(propertyCtx, {
+    type: 'doughnut',
+    data: {
+      labels: propertyData.map(
+        (item) =>
+          item.property_type.charAt(0).toUpperCase() +
+          item.property_type.slice(1)
+      ),
+      datasets: [
+        {
+          data: propertyData.map((item) => item.count),
+          backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
+          borderWidth: 1,
+        },
+      ],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true, // Change this to true
+      plugins: {
+        legend: {
+          position: 'bottom',
+        },
+      },
+    },
+  });
+</script>
 {% endblock %}
