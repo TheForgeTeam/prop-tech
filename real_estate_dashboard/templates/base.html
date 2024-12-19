@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Real Estate Manager</title>
+    {% load static %} {% load tailwind_tags %} {% tailwind_css %}
+  </head>
+  <body class="bg-gray-100">
+    <nav class="bg-white shadow-lg">
+      <div class="max-w-7xl mx-auto px-4">
+        <div class="flex justify-between h-16">
+          <div class="flex">
+            <a href="{% url 'dashboard' %}" class="flex items-center">
+              <span class="text-xl font-semibold">Real Estate Manager</span>
+            </a>
+          </div>
+          <div class="flex items-center">
+            <a
+              href="{% url 'dashboard' %}"
+              class="px-3 py-2 text-gray-700 hover:text-gray-900"
+              >Dashboard</a
+            >
+            <a
+              href="{% url 'rentals' %}"
+              class="px-3 py-2 text-gray-700 hover:text-gray-900"
+              >Rentals</a
+            >
+            <a
+              href="{% url 'properties' %}"
+              class="px-3 py-2 text-gray-700 hover:text-gray-900"
+              >Buy/Sell</a
+            >
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="container mx-auto px-4 py-8">
+      {% block content %} {% endblock %}
+    </main>
+  </body>
+</html>
