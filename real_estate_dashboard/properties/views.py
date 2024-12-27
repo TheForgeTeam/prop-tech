@@ -3,6 +3,8 @@ from django.db.models import Count, Sum
 from .models import Property, Deal
 from decimal import Decimal
 import json  # Add this import
+from django.http import JsonResponse
+from django.views.decorators.http import require_http_methods
 
 # Add this custom JSON encoder
 class DecimalEncoder(json.JSONEncoder):
@@ -61,18 +63,37 @@ def rentals(request):
         deal_type='rent'
     ).select_related('property', 'property__owner', 'property__owner__user').order_by('-created_at')
 
-    # Get monthly rental counts for the bar chart
-    monthly_rentals = Deal.objects.filter(
-        deal_type='rent'
-    ).extra(select={'month': "strftime('%%Y-%%m', start_date)"}).values('month').annotate(
-        count=Count('id')
-    ).order_by('month')
+    # Get available properties for the form
+    available_properties = Property.objects.filter(is_available=True)
 
     context = {
         'rental_deals': rental_deals,
-        'monthly_data_json': json.dumps(list(monthly_rentals), cls=DecimalEncoder),
+        'available_properties': available_properties,
     }
     return render(request, 'properties/rentals.html', context)
+
+@require_http_methods(["POST"])
+def create_rental(request):
+    try:
+        property_id = request.POST.get('property')
+        price = request.POST.get('price')
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date') or None
+
+        property_obj = Property.objects.get(id=property_id)
+        
+        Deal.objects.create(
+            property=property_obj,
+            deal_type='rent',
+            status='pending',
+            price=price,
+            start_date=start_date,
+            end_date=end_date
+        )
+
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'success': False, 'error': str(e)})
 
 def properties(request):
     return render(request, 'properties/properties.html')
