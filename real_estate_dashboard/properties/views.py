@@ -5,6 +5,7 @@ from decimal import Decimal
 import json  # Add this import
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
+from decimal import Decimal, InvalidOperation
 
 # Add this custom JSON encoder
 class DecimalEncoder(json.JSONEncoder):
@@ -104,4 +105,47 @@ def create_rental(request):
         return JsonResponse({'success': False, 'error': str(e)})
 
 def properties(request):
-    return render(request, 'properties/properties.html')
+    # Get all sale deals with related property data
+    sale_deals = Deal.objects.filter(
+        deal_type='sale'
+    ).select_related('property', 'property__owner', 'property__owner__user').order_by('-created_at')
+
+    # Get available properties for the form
+    available_properties = Property.objects.filter(is_available=True)
+
+    context = {
+        'sale_deals': sale_deals,
+        'available_properties': available_properties,
+    }
+    return render(request, 'properties/properties.html', context)
+
+@require_http_methods(["POST"])
+def create_sale(request):
+    try:
+        property_id = request.POST.get('property')
+        price_str = request.POST.get('price')
+        start_date = request.POST.get('start_date')
+
+        # Validate and convert price to Decimal
+        try:
+            price = Decimal(price_str)
+        except InvalidOperation:
+            return JsonResponse({
+                'success': False, 
+                'error': 'Invalid price format. Please enter a valid number.'
+            })
+
+        property_obj = Property.objects.get(id=property_id)
+        
+        Deal.objects.create(
+            property=property_obj,
+            deal_type='sale',
+            status='pending',
+            price=price,
+            start_date=start_date
+        )
+
+        return JsonResponse({'success': True})
+    except Exception as e:
+        print(f"Error creating sale: {str(e)}")  # Debug print
+        return JsonResponse({'success': False, 'error': str(e)})
