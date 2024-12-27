@@ -56,7 +56,23 @@ def dashboard(request):
 
 
 def rentals(request):
-    return render(request, 'properties/rentals.html')
+    # Get all rental deals with related property data
+    rental_deals = Deal.objects.filter(
+        deal_type='rent'
+    ).select_related('property', 'property__owner', 'property__owner__user').order_by('-created_at')
+
+    # Get monthly rental counts for the bar chart
+    monthly_rentals = Deal.objects.filter(
+        deal_type='rent'
+    ).extra(select={'month': "strftime('%%Y-%%m', start_date)"}).values('month').annotate(
+        count=Count('id')
+    ).order_by('month')
+
+    context = {
+        'rental_deals': rental_deals,
+        'monthly_data_json': json.dumps(list(monthly_rentals), cls=DecimalEncoder),
+    }
+    return render(request, 'properties/rentals.html', context)
 
 def properties(request):
     return render(request, 'properties/properties.html')
