@@ -248,8 +248,13 @@
           if (data.success) {
             window.location.reload();
           } else {
-            alert('Error creating rental');
+            console.error('Server error:', data.error); // Log the error details
+            alert('Error creating rental: ' + data.error); // Show the actual error message
           }
+        })
+        .catch((error) => {
+          console.error('Fetch error:', error); // Log any fetch errors
+          alert('Error submitting form: ' + error);
         });
     });
 </script>

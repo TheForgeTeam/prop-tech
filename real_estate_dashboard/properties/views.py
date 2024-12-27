@@ -80,9 +80,16 @@ def create_rental(request):
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date') or None
 
+        # Debug prints
+        print("Received data:")
+        print(f"Property ID: {property_id}")
+        print(f"Price: {price}")
+        print(f"Start date: {start_date}")
+        print(f"End date: {end_date}")
+
         property_obj = Property.objects.get(id=property_id)
         
-        Deal.objects.create(
+        new_deal = Deal.objects.create(
             property=property_obj,
             deal_type='rent',
             status='pending',
@@ -93,6 +100,7 @@ def create_rental(request):
 
         return JsonResponse({'success': True})
     except Exception as e:
+        print(f"Error creating rental: {str(e)}")  # Debug print
         return JsonResponse({'success': False, 'error': str(e)})
 
 def properties(request):
