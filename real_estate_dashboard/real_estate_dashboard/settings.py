@@ -30,6 +30,24 @@ ALLOWED_HOSTS = []
 
 
 # Application definition
+# INSTALLED_APPS = [
+#     'django.contrib.admin',
+#     'django.contrib.auth',
+#     'django.contrib.contenttypes',
+#     'django.contrib.sessions',
+#     'django.contrib.messages',
+#     'django.contrib.staticfiles',
+    
+#     # Our apps
+#     'properties.apps.PropertiesConfig',
+#     'accounts',
+    
+#     # Third-party apps
+#     'tailwind',
+#     'theme',  # Add this back
+# ]
+
+
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -37,14 +55,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    
-    # Our apps
     'properties.apps.PropertiesConfig',
-    'accounts',
-    
-    # Third-party apps
     'tailwind',
-    'theme',  # Add this back
+    'theme',
+    'accounts',  # Add this
 ]
 
 # Add this at the bottom of the file
@@ -69,7 +83,7 @@ ROOT_URLCONF = 'real_estate_dashboard.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')],  # Add this line
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
