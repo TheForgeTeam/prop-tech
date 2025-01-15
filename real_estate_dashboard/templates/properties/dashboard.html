@@ -1,9 +1,8 @@
 {% extends 'base.html' %} {% block extra_head %}
 <style>
-  .chart-container {
-    position: relative;
-    height: 300px;
-    width: 100%;
+  canvas#dealsChart,
+  canvas#propertyTypesChart {
+    min-height: 300px;
   }
 </style>
 {% endblock %} {% block content %}
@@ -28,15 +27,11 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
     <div class="bg-white rounded-lg shadow p-6">
       <h3 class="text-lg font-semibold mb-4">Deals Distribution</h3>
-      <div class="chart-container">
-        <canvas id="dealsChart"></canvas>
-      </div>
+      <canvas id="dealsChart"></canvas>
     </div>
     <div class="bg-white rounded-lg shadow p-6">
       <h3 class="text-lg font-semibold mb-4">Property Types</h3>
-      <div class="chart-container flex justify-center">
-        <canvas id="propertyTypesChart"></canvas>
-      </div>
+      <canvas id="propertyTypesChart"></canvas>
     </div>
   </div>
 
@@ -145,8 +140,8 @@
 <!-- Chart.js Script -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-  // Deals Distribution Chart
   const dealsData = JSON.parse('{{ deals_by_type_json|safe }}');
+
   const dealsCtx = document.getElementById('dealsChart').getContext('2d');
   new Chart(dealsCtx, {
     type: 'bar',
@@ -165,7 +160,7 @@
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true, // Change this to true
+      maintainAspectRatio: true,
       scales: {
         y: {
           beginAtZero: true,
@@ -177,7 +172,6 @@
     },
   });
 
-  // Property Types Chart
   const propertyData = JSON.parse('{{ property_by_type_json|safe }}');
   const propertyCtx = document
     .getElementById('propertyTypesChart')
@@ -200,7 +194,7 @@
     },
     options: {
       responsive: true,
-      maintainAspectRatio: true, // Change this to true
+      maintainAspectRatio: true,
       plugins: {
         legend: {
           position: 'bottom',
