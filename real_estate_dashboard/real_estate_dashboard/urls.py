@@ -18,10 +18,16 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path, include
+from django.shortcuts import redirect
+from django.contrib.auth.decorators import login_required
+
+def home(request):
+    return redirect('dashboard')
 
 urlpatterns = [
+    path('', home, name='home'),  # Add this line
     path('admin/', admin.site.urls),
-    path('', include('properties.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     path('accounts/signup/', include('accounts.urls')),
+    path('dashboard/', include('properties.urls')),  # Update this line
 ]

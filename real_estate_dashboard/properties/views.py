@@ -123,8 +123,8 @@ def properties(request):
     }
     return render(request, 'properties/properties.html', context)
 
-@require_http_methods(["POST"])
 @login_required
+@require_http_methods(["POST"])
 def create_sale(request):
     try:
         property_id = request.POST.get('property')

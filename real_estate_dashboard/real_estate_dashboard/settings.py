@@ -67,12 +67,16 @@ TAILWIND_APP_NAME = 'theme'
 # Add this near your TAILWIND_APP_NAME setting
 NPM_BIN_PATH = "C:/Program Files/nodejs/npm.cmd"  # Adjust this path to match your system
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',  # Make sure this is here
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
@@ -155,7 +159,12 @@ STATICFILES_DIRS = [
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Add these settings for login/logout redirects
+# Add or update these settings
 LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'dashboard'
+LOGIN_REDIRECT_URL = '/'  # This will redirect to homepage after login
 LOGOUT_REDIRECT_URL = 'login'
+
+
+print("LOGIN_REDIRECT_URL:", LOGIN_REDIRECT_URL)
+print("LOGIN_URL:", LOGIN_URL)
+print("AUTHENTICATION_BACKENDS:", AUTHENTICATION_BACKENDS)
