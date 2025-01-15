@@ -6,6 +6,7 @@ import json  # Add this import
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from decimal import Decimal, InvalidOperation
+from django.contrib.auth.decorators import login_required
 
 # Add this custom JSON encoder
 class DecimalEncoder(json.JSONEncoder):
@@ -14,6 +15,7 @@ class DecimalEncoder(json.JSONEncoder):
             return float(obj)
         return super().default(obj)
 
+@login_required
 def dashboard(request):
     # Get summary statistics
     total_properties = Property.objects.count()
@@ -57,7 +59,7 @@ def dashboard(request):
     return render(request, 'properties/dashboard.html', context)
 
 
-
+@login_required
 def rentals(request):
     # Get all rental deals with related property data
     rental_deals = Deal.objects.filter(
@@ -73,6 +75,7 @@ def rentals(request):
     }
     return render(request, 'properties/rentals.html', context)
 
+@login_required
 @require_http_methods(["POST"])
 def create_rental(request):
     try:
@@ -104,6 +107,7 @@ def create_rental(request):
         print(f"Error creating rental: {str(e)}")  # Debug print
         return JsonResponse({'success': False, 'error': str(e)})
 
+@login_required
 def properties(request):
     # Get all sale deals with related property data
     sale_deals = Deal.objects.filter(
@@ -120,6 +124,7 @@ def properties(request):
     return render(request, 'properties/properties.html', context)
 
 @require_http_methods(["POST"])
+@login_required
 def create_sale(request):
     try:
         property_id = request.POST.get('property')
