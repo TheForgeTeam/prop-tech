@@ -2,7 +2,8 @@
 <style>
   canvas#dealsChart,
   canvas#propertyTypesChart {
-    min-height: 300px;
+    min-height: 200px;
+    max-height: 250px;
   }
 </style>
 {% endblock %} {% block content %}
@@ -27,11 +28,15 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
     <div class="bg-white rounded-lg shadow p-6">
       <h3 class="text-lg font-semibold mb-4">Deals Distribution</h3>
-      <canvas id="dealsChart"></canvas>
+      <div class="h-[250px]">
+        <canvas id="dealsChart"></canvas>
+      </div>
     </div>
     <div class="bg-white rounded-lg shadow p-6">
       <h3 class="text-lg font-semibold mb-4">Property Types</h3>
-      <canvas id="propertyTypesChart"></canvas>
+      <div class="h-[250px] flex justify-center">
+        <canvas id="propertyTypesChart"></canvas>
+      </div>
     </div>
   </div>
 
