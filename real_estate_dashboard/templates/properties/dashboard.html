@@ -143,69 +143,72 @@
 </div>
 
 <!-- Chart.js Script -->
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-  const dealsData = JSON.parse('{{ deals_by_type_json|safe }}');
+<!-- Chart.js Script - Add this at the bottom of your dashboard template, just before the ending block tag -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
 
-  const dealsCtx = document.getElementById('dealsChart').getContext('2d');
-  new Chart(dealsCtx, {
-    type: 'bar',
-    data: {
-      labels: dealsData.map((item) =>
-        item.deal_type === 'rent' ? 'Rentals' : 'Sales'
-      ),
-      datasets: [
-        {
-          label: 'Number of Deals',
-          data: dealsData.map((item) => item.count),
-          backgroundColor: ['#3B82F6', '#10B981'],
-          borderWidth: 1,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      scales: {
-        y: {
-          beginAtZero: true,
-          ticks: {
-            stepSize: 1,
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const dealsData = JSON.parse('{{ deals_by_type_json|safe }}');
+    const dealsCtx = document.getElementById('dealsChart').getContext('2d');
+    new Chart(dealsCtx, {
+      type: 'bar',
+      data: {
+        labels: dealsData.map((item) =>
+          item.deal_type === 'rent' ? 'Rentals' : 'Sales'
+        ),
+        datasets: [
+          {
+            label: 'Number of Deals',
+            data: dealsData.map((item) => item.count),
+            backgroundColor: ['#3B82F6', '#10B981'],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              stepSize: 1,
+            },
           },
         },
       },
-    },
-  });
+    });
 
-  const propertyData = JSON.parse('{{ property_by_type_json|safe }}');
-  const propertyCtx = document
-    .getElementById('propertyTypesChart')
-    .getContext('2d');
-  new Chart(propertyCtx, {
-    type: 'doughnut',
-    data: {
-      labels: propertyData.map(
-        (item) =>
-          item.property_type.charAt(0).toUpperCase() +
-          item.property_type.slice(1)
-      ),
-      datasets: [
-        {
-          data: propertyData.map((item) => item.count),
-          backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
-          borderWidth: 1,
-        },
-      ],
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: true,
-      plugins: {
-        legend: {
-          position: 'bottom',
+    const propertyData = JSON.parse('{{ property_by_type_json|safe }}');
+    const propertyCtx = document
+      .getElementById('propertyTypesChart')
+      .getContext('2d');
+    new Chart(propertyCtx, {
+      type: 'doughnut',
+      data: {
+        labels: propertyData.map(
+          (item) =>
+            item.property_type.charAt(0).toUpperCase() +
+            item.property_type.slice(1)
+        ),
+        datasets: [
+          {
+            data: propertyData.map((item) => item.count),
+            backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#EF4444'],
+            borderWidth: 1,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+          legend: {
+            position: 'bottom',
+          },
         },
       },
-    },
+    });
   });
 </script>
 {% endblock %}
